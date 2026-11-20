@@ -1,0 +1,3 @@
+date,category,value,area,source,url,note
+#example 2026-01-01,Deaths,0,National,Replace with official source,https://example.org,Rows starting with # are ignored
+#example 2026-01-01,Houses damaged,0,Province X,Replace with official source,https://example.org,Latest row per category becomes a headline figure

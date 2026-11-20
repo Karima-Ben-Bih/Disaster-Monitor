@@ -1,0 +1,33 @@
+{
+  "event_id": "tur-eq-2023-02",
+  "hazard": "earthquake",
+  "title": {
+    "en": "M7.8 Kahramanmaras earthquake (DEMO - replace)",
+    "es": "Sismo M7.8 de Kahramanmaras (DEMO - reemplazar)"
+  },
+  "country": "Türkiye",
+  "local_timezone": "Europe/Istanbul",
+  "languages": ["en", "es"],
+
+  "usgs_id": "us6000jllz",
+
+  "aftershocks": {
+    "radius_km": 250,
+    "min_magnitude": 3.0,
+    "days": 30
+  },
+
+  "impacts_csv_url": "",
+  "updates_csv_url": "",
+
+  "official_sources": [
+    { "name": "National disaster management agency (replace)", "url": "https://example.org" }
+  ],
+
+  "team": "GFDRR Rapid Monitor team",
+  "contact": "",
+  "disclaimer": {
+    "en": "Unofficial situational overview compiled from public sources for internal coordination. Figures are preliminary and may change. Official government figures take precedence.",
+    "es": "Resumen situacional no oficial elaborado con fuentes públicas para coordinación interna. Las cifras son preliminares y pueden cambiar. Prevalecen las cifras oficiales del gobierno."
+  }
+}
