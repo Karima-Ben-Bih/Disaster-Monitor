@@ -1,0 +1,72 @@
+name: Update and publish monitor
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 min (GitHub may delay scheduled runs at busy times)
+  workflow_dispatch:          # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch hazard data and curated sheets
+        env:
+          IMPACTS_CSV_URL: ${{ secrets.IMPACTS_CSV_URL }}
+          UPDATES_CSV_URL: ${{ secrets.UPDATES_CSV_URL }}
+        run: python scripts/fetch_data.py
+
+      - name: Bundle site into one file
+        run: python scripts/build.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Password-protect (if SITE_PASSWORD secret is set)
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: |
+          mkdir -p site
+          if [ -n "$SITE_PASSWORD" ]; then
+            # Fixed salt per repository, so "remember me" survives the 30-minute rebuilds
+            SALT=$(printf '%s' "$GITHUB_REPOSITORY" | md5sum | cut -c1-32)
+            npx --yes staticrypt@3 dist/index.html -p "$SITE_PASSWORD" --salt "$SALT" -d site --short \
+              --template-title "Restricted situational overview" \
+              --template-instructions "Enter the access code shared by the team."
+          else
+            echo "No SITE_PASSWORD secret - publishing without a password"
+            cp dist/index.html site/index.html
+          fi
+          touch site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
